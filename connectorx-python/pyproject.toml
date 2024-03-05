@@ -71,11 +71,3 @@ python_functions = "test_* bench_*"
 [build-system]
 build-backend = "maturin"
 requires = ["maturin>=1.0,<2.0"]
-
-[tool.maturin]
-include = [
-    { path = "connectorx/*.so", format = "sdist"},
-    { path = "connectorx/*.pyd", format = "sdist"},
-    { path = "connectorx/dependencies/", format = "sdist"},
-    { path = "LICENSE", format = "sdist"},
-]

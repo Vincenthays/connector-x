@@ -19,21 +19,6 @@ except:
     except:
         pass
 
-import os
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
-# check whether it is in development env or installed
-if (
-    not os.path.basename(os.path.abspath(os.path.join(dir_path, "..")))
-    == "connectorx-python"
-):
-    if "J4RS_BASE_PATH" not in os.environ:
-        os.environ["J4RS_BASE_PATH"] = os.path.join(dir_path, "dependencies")
-if "CX_REWRITER_PATH" not in os.environ:
-    os.environ["CX_REWRITER_PATH"] = os.path.join(
-        dir_path, "dependencies/federated-rewriter.jar"
-    )
-
 
 def rewrite_conn(conn: str, protocol: Optional[str] = None):
     if not protocol:

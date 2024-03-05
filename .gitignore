@@ -25,3 +25,7 @@ flake.nix
 flake.lock
 .envrc
 .direnv/
+lib
+bin
+Dockerfile
+Makefile
