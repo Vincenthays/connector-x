@@ -16,7 +16,7 @@ description = "Load data from databases to dataframes, the fastest way."
 keywords = ["read_sql"] 
 license = "MIT" 
 maintainers = ["Weiyuan Wu <youngw@sfu.ca>"] 
-name = "connectorx" 
+name = "connectorx2"
 readme = "README.md" # Markdown files are supported
 version = "0.3.3-alpha.2" 
 
