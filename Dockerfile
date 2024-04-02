@@ -15,4 +15,4 @@ RUN pyenv exec pip install maturin
 RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain none
 ENV PATH "/root/.cargo/bin:${PATH}"
 
-CMD maturin publish --repository bigtable2 --no-sdist
+#RUN pyenv exec maturin publish --repository bigtable2 --no-sdist -i python3.11 python3.12
