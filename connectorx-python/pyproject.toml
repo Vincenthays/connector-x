@@ -18,10 +18,10 @@ license = "MIT"
 maintainers = ["Weiyuan Wu <youngw@sfu.ca>"] 
 name = "connectorx" 
 readme = "README.md" # Markdown files are supported
-version = "0.3.3-alpha.1"
+version = "0.3.3-alpha.2" 
 
 [project]
-name = "connectorx2" # Target file name of maturin build
+name = "connectorx" # Target file name of maturin build
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.8"
@@ -71,3 +71,11 @@ python_functions = "test_* bench_*"
 [build-system]
 build-backend = "maturin"
 requires = ["maturin>=1.0,<2.0"]
+
+[tool.maturin]
+include = [
+    { path = "connectorx/*.so", format = "sdist"},
+    { path = "connectorx/*.pyd", format = "sdist"},
+    { path = "connectorx/dependencies/", format = "sdist"},
+    { path = "LICENSE", format = "sdist"},
+]

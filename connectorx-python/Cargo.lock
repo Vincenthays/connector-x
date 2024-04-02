@@ -917,9 +917,9 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "chrono"
-version = "0.4.34"
+version = "0.4.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5bc015644b92d5890fab7489e49d21f879d5c990186827d42ec511919404f38b"
+checksum = "8a0d04d43504c61aa6c7531f1871dd0d418d91130162063b789da00fd7057a5e"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
@@ -1020,7 +1020,7 @@ dependencies = [
 
 [[package]]
 name = "connectorx"
-version = "0.3.3-alpha.1"
+version = "0.3.3-alpha.2"
 dependencies = [
  "anyhow",
  "arrow",
@@ -1035,7 +1035,7 @@ dependencies = [
  "futures",
  "gcp-bigquery-client",
  "hex",
- "itertools 0.10.5",
+ "itertools 0.11.0",
  "j4rs",
  "log",
  "mysql_common",
@@ -1070,7 +1070,7 @@ dependencies = [
 
 [[package]]
 name = "connectorx-python"
-version = "0.3.3"
+version = "0.3.3-alpha.2"
 dependencies = [
  "anyhow",
  "arrow",
