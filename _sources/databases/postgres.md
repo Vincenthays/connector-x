@@ -9,8 +9,10 @@
 ```{hint}
 Adding `sslmode=require` to connection uri parameter force SSL connection. Example: `postgresql://username:password@host:port/db?sslmode=require`. `sslmode=disable` to disable SSL connection.
 
-To connect to redshift, replace `postgresql://` with `redshift://`.
+To connect to redshift using username and password, replace `postgresql://` with `redshift://`.
 ```
+
+To connect to redshift via PingFed, replace `postgresql://` with `redshift-iam://` and provide the required arguments as query string parameters (see [AWS docs](https://docs.aws.amazon.com/redshift/latest/mgmt/options-for-providing-iam-credentials.html)). Other custom identity providers can be supported as well, feel free to contribute to [redshift-iam](https://github.com/antivirak/redshift-iam-rs) crate.
 
 ```py
 import connectorx as cx
@@ -23,6 +25,7 @@ cx.read_sql(conn, query)                                        # read data from
 
 | Postgres Type   |      Pandas Type          |  Comment                           |
 |:---------------:|:-------------------------:|:----------------------------------:|
+| OID             | u32                       | a data type for identifying internal objects |
 | BOOL            | bool, boolean(nullable)   |                                    |
 | INT2            | int64, Int64(nullable)    |                                    |
 | INT4            | int64, Int64(nullable)    |                                    |
@@ -31,6 +34,7 @@ cx.read_sql(conn, query)                                        # read data from
 | FLOAT8          | float64                   |                                    |
 | NUMERIC         | float64                   | cannot support precision larger than 28                                    |
 | TEXT            | object                    |                                    |
+| TSVECTOR        | object                    | PostgreSQL text representation, retaining lexemes, positions, and weights |
 | BPCHAR          | object                    |                                    |
 | VARCHAR         | object                    |                                    |
 | CHAR            | object                    |                                    |
@@ -51,12 +55,19 @@ cx.read_sql(conn, query)                                        # read data from
 | HalfVec         | object                    | list of f32                        |
 | Bit             | object                    |                                    |
 | SparseVec       | object                    | list of f32                        |
+| BOOL[]          | object                    | list of bool                       |
 | INT2[]          | object                    | list of i64                        |
 | INT4[]          | object                    | list of i64                        |
 | INT8[]          | object                    | list of i64                        |
 | FLOAT4[]        | object                    | list of f64                        |
 | FLOAT8[]        | object                    | list of f64                        |
 | NUMERIC[]       | object                    | list of f64                        |
+
+`TSVECTOR` is returned as strings in Pandas, Arrow, and Polars without requiring
+an explicit cast in the query. Binary, CSV, cursor, and simple protocols are
+supported. As with other string columns, the CSV protocol cannot distinguish an
+empty vector (`''::tsvector`) from `NULL`; use binary, cursor, or simple to preserve
+that distinction. `TSQUERY` and `TSVECTOR[]` are not supported.
 
 ## Performance (db.m6g.4xlarge RDS)
 

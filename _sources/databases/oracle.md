@@ -21,11 +21,24 @@ query = 'SELECT * FROM table'                                   # query string
 cx.read_sql(conn, query)                                        # read data from Oracle
 ```
 
+### Specifying Default Schema
+
+With version>=0.4.5 you can specify a default schema by adding the `schema` query parameter to the connection URL. This automatically sets the current schema for all connections, eliminating the need to prefix table names with the schema in your queries.
+
+```py
+import connectorx as cx
+# Specify schema in the connection URL
+conn = 'oracle://username:password@server:port/database?schema=MY_SCHEMA'
+query = 'SELECT * FROM table'  # No need to use MY_SCHEMA.table
+cx.read_sql(conn, query)
+```
+
 ### Oracle-Pandas Type Mapping
 | Oracle Type               |      Pandas Type            |  Comment                           |
 |:-------------------------:|:---------------------------:|:----------------------------------:|
 | Number(\*,0)              | int64, Int64(nullable)      |                                    |
-| Number(\*,>0)             | float64                     |                                    |
+| Number(0,0)               | object (Decimal)            | Unconstrained `NUMBER` (no precision/scale declared). Backed by `rust_decimal::Decimal`: exact, but limited to ~28-29 significant digits and a max scale of 28 — narrower than Oracle's own NUMBER limit (38 digits, scale -84..127). A value exceeding this will error rather than silently lose precision. |
+| Number(\*,>0)             | object (Decimal)            | Backed by `rust_decimal::Decimal`, same precision limit as above.  |
 | Float                     | float64                     |                                    |
 | BINARY_FLOAT              | float64                     |                                    |
 | BINARY_DOUBLE             | float64                     |                                    |
@@ -36,6 +49,11 @@ cx.read_sql(conn, query)                                        # read data from
 | DATE                      | datetime64[ns]              |                                    |
 | TIMESTAMP                 | datetime64[ns]              |                                    |
 | TIMESTAMP WITH TIME ZONE  | datetime64[ns]              |                                    |
+| BOOLEAN                   | bool, boolean(nullable)     | Native `BOOLEAN` column type, available since Oracle 23ai |
+
+```{warning}
+Reading native `BOOLEAN` columns needs a recent Oracle Instant Client. With Instant Client 23.4 some `FALSE` values come back as `True`, depending on the fetch array size, and no error is raised. Instant Client 23.26.3 reads them correctly and is the version CI tests against.
+```
 
 ### Performance (db.r5.4xlarge RDS)
 

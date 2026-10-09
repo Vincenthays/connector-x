@@ -10,9 +10,46 @@ The easiest way to install ConnectorX is using pip, with the following command:
 pip install connectorx
 ```
 
-```{note}
-For AArch64 or ARM64 Linux users, `connectorx==0.4.3 & above` is only available for distributions using `glibc 2.35` and above. Specifically, the re-release for this architecture was tested on Ubuntu 22.04. For older distributions, the latest version available is `connectorx==0.2.3` due to dependency limitations.
+### Databricks containers
+
+On `databricksruntime/minimal:16.4-LTS`, some Linux wheels abort during
+`import connectorx` with:
+
+```text
+crypto/fips/fips.c:154: OpenSSL internal error: FATAL FIPS SELFTEST FAILURE
 ```
+
+This was reproduced with the Linux x86_64 wheels for 0.4.3 and 0.4.6a1,
+using Python 3.12.11. Those wheels bundle a distribution-specific OpenSSL
+1.1 library through Kerberos/GSSAPI. Its initializer aborts even with the
+container's inherited `OPENSSL_FORCE_FIPS_MODE=0`. This happens before a
+database connection; changing PostgreSQL connection options will not fix it.
+
+The Linux release build now builds MIT Kerberos against OpenSSL 3 before
+packaging the wheel. GSSAPI remains enabled, and ConnectorX does not change
+the application's OpenSSL environment or host FIPS settings. This is an
+import-compatibility fix, **not a claim of FIPS-compliant or certified
+cryptographic operation**.
+
+These Linux wheels retain the manylinux Kerberos plugin directories
+(`/usr/lib64/krb5/plugins` and `/usr/lib64/gss`), rather than looking under
+the build-only prefix. Existing `plugin_base_dir` overrides and relative
+plugin registrations remain supported. Plugins are not bundled; applications
+using them must still supply compatible plugins and their dependencies.
+
+To check a candidate Python 3.12 Linux x86_64 wheel on a machine with Bash
+and Docker's Linux engine:
+
+```bash
+bash scripts/check-databricks-wheel.sh path/to/connectorx-wheel.whl
+```
+
+The check uses the image digest from the original report, installs the supplied
+wheel without querying PyPI, and checks repeated imports and both import orders
+with Python's `ssl` module in fresh processes. It leaves inherited crypto
+settings unchanged. The `release` workflow can also be run manually to build
+and check a candidate Linux x86_64/Python 3.12 wheel without publishing it.
+Do not assume an older published wheel contains this build change.
 
 ### Build from source code
 
@@ -47,4 +84,3 @@ just build-python-wheel
 NOTES:
 * `OPENSSL_NO_VENDOR=1` might required to compile for windows users.
 * Dynamic library is required for the python installation. (e.g. If you are using `pyenv`, use command `PYTHON_CONFIGURE_OPTS=“--enable-shared” pyenv install {version}` to install python since dylib is not enabled by default.)
-
